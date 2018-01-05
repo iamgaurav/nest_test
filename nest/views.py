@@ -20,8 +20,11 @@ def get_next_data(headers):
 # Create your views here.
 
 def index(request):
-    context = { 'client_id': config.CLIENT_ID }
-    return render(request,'nest/index.html',context)
+    if request.session.get('access_token'):
+        return HttpResponseRedirect("/client")
+    else:
+        context = { 'client_id': config.CLIENT_ID }
+        return render(request,'nest/index.html',context)
 
 def client(request):
     if request.method == "POST":
@@ -43,11 +46,23 @@ def client(request):
             response = get_next_data(headers)
 
             devices = response["devices"]["thermostats"]
+            request.session.modified = True
+            devices = response["devices"]["thermostats"]
+            return render(request, 'nest/client.html', context={'devices': devices})
         else:
-            print(req.content)
+            return HttpResponseRedirect("/client")
 
     else:
-        return HttpResponse(request.session.get('access_token'))
+        if request.session.get('access_token'):
+            token = request.session.get('access_token')
+            # Fetch all Devices
+            headers = {"Authorization": "Bearer " + token, 'Content-type': 'application/json'}
+            response = get_next_data(headers)
+
+            devices = response["devices"]["thermostats"]
+            request.session.modified = True
+            devices = response["devices"]["thermostats"]
+            return render(request, 'nest/client.html', context={'devices': devices})
 
 def thermostat_update(request):
     if request.method == "POST":
