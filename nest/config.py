@@ -1,0 +1,2 @@
+CLIENT_ID = "b506190c-be79-4db2-8c82-e9db35ce9eeb"
+CLIENT_SECRET = "OWpkhxHTOfQjJaEjfIUfhSkXg"
